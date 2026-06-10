@@ -1,5 +1,30 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import Logo from '@/components/Logo';
+
+const featuredConsoles = [
+  {
+    name: 'PlayStation 5',
+    label: 'PS5',
+    src: '/assets/consoles/ps5.webp',
+    className: 'sm:row-span-2',
+    imageClassName: 'p-8 pb-20 sm:p-10 sm:pb-24',
+  },
+  {
+    name: 'Xbox Series X',
+    label: 'Xbox Series X',
+    src: '/assets/consoles/xbox-series-x-microsoft-official.webp',
+    className: '',
+    imageClassName: 'p-5 pb-20',
+  },
+  {
+    name: 'Nintendo Switch 2',
+    label: 'Nintendo Switch 2',
+    src: '/assets/consoles/nintendo-switch-2.webp',
+    className: '',
+    imageClassName: 'p-5 pb-20',
+  },
+];
 
 export default function LandingPage() {
   return (
@@ -32,17 +57,28 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#181818] p-5 shadow-[0_20px_80px_rgba(0,0,0,.35)]">
-            <div className="absolute right-0 top-0 h-32 w-32 rounded-full bg-navy-400/20 blur-3xl" />
-            <div className="grid grid-cols-2 gap-3">
-              {['PS5', 'Switch', 'Xbox', 'Acessórios'].map((item, index) => (
-                <div key={item} className="rounded-xl border border-white/10 bg-white/[0.04] p-4">
-                  <div className={`mb-8 h-20 rounded-lg ${index % 2 ? 'bg-navy-400/20' : 'bg-white/10'}`} />
-                  <p className="text-sm font-black">{item}</p>
-                  <p className="mt-1 text-xs text-warm-400">Disponível no catálogo</p>
+          <div className="grid gap-3 sm:grid-cols-[0.92fr_1.08fr]">
+            {featuredConsoles.map((console) => (
+              <article
+                key={console.name}
+                className={`overflow-hidden rounded-xl border border-white/10 bg-[#181818] shadow-[0_20px_80px_rgba(0,0,0,.32)] ${console.className}`}
+              >
+                <div className="relative h-48 bg-white/[0.04] sm:h-full sm:min-h-52">
+                  <Image
+                    src={console.src}
+                    alt={`${console.name} disponível na Checkpoint Games`}
+                    fill
+                    priority={console.label === 'PS5'}
+                    sizes="(min-width: 640px) 260px, 90vw"
+                    className={`object-contain ${console.imageClassName}`}
+                  />
+                  <div className="absolute inset-x-0 bottom-0 border-t border-white/10 bg-[#181818]/95 p-4">
+                    <p className="text-sm font-black">{console.label}</p>
+                    <p className="mt-1 text-xs text-warm-400">Disponível no catálogo</p>
+                  </div>
                 </div>
+              </article>
               ))}
-            </div>
           </div>
         </section>
 
