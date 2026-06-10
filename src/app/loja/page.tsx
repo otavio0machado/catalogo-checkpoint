@@ -5,7 +5,6 @@ import SearchBar from '@/components/SearchBar';
 import ProductGrid from '@/components/ProductGrid';
 import type { Product } from '@/types';
 import { getSupabaseAdmin } from '@/lib/supabase';
-import { mergeWithListedProducts } from '@/lib/catalog';
 import { parseMedia, sanitizeSearchTerm } from '@/lib/products';
 
 async function getProducts(searchParams: Record<string, string>): Promise<Product[]> {
@@ -36,10 +35,10 @@ async function getProducts(searchParams: Record<string, string>): Promise<Produc
     }
 
     const { data, error } = await query;
-    if (error) return mergeWithListedProducts([], filters);
-    return mergeWithListedProducts((data || []).map((row) => parseMedia(row)) as Product[], filters);
+    if (error) return [];
+    return (data || []).map((row) => parseMedia(row)) as Product[];
   } catch {
-    return mergeWithListedProducts([], filters);
+    return [];
   }
 }
 

@@ -3,7 +3,6 @@ import type { MediaItem, Product } from '@/types';
 import AddToCartButton from './AddToCartButton';
 import MediaGallery from '@/components/MediaGallery';
 import { getSupabaseAdmin } from '@/lib/supabase';
-import { getListedProductById } from '@/lib/catalog';
 import { formatCurrency, formatPriceLabel, hasKnownPrice } from '@/lib/price';
 import { parseMedia } from '@/lib/products';
 
@@ -26,16 +25,12 @@ async function getProduct(id: string): Promise<(Product & { mediaItems: MediaIte
       .eq('status', 'available')
       .single();
 
-    if (error || !data) {
-      const fallback = getListedProductById(productId);
-      return fallback ? { ...fallback, mediaItems: mediaItems(fallback) } : null;
-    }
+    if (error || !data) return null;
 
     const parsed = parseMedia(data) as Product;
     return { ...parsed, mediaItems: mediaItems(parsed) };
   } catch {
-    const fallback = getListedProductById(productId);
-    return fallback ? { ...fallback, mediaItems: mediaItems(fallback) } : null;
+    return null;
   }
 }
 

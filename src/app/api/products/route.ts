@@ -8,7 +8,6 @@ import {
   sanitizePublicProduct,
   sanitizeSearchTerm,
 } from '@/lib/products';
-import { mergeWithListedProducts } from '@/lib/catalog';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -17,7 +16,6 @@ export async function GET(request: Request) {
   const platform = searchParams.get('platform') || '';
   const genre = searchParams.get('genre') || '';
   const condition = searchParams.get('condition') || '';
-  const filters = { search, type, platform, genre, condition };
 
   try {
     const supabase = getSupabaseAdmin();
@@ -39,24 +37,15 @@ export async function GET(request: Request) {
 
     const { data, error } = await query;
     if (error) {
-      return NextResponse.json(
-        mergeWithListedProducts([], filters).map((product) =>
-          sanitizePublicProduct(product as unknown as Record<string, unknown>)
-        )
-      );
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
     const supabaseProducts = (data || []).map((row) => parseMedia(row)) as Product[];
-    const products = mergeWithListedProducts(supabaseProducts, filters);
     return NextResponse.json(
-      products.map((product) => sanitizePublicProduct(product as unknown as Record<string, unknown>))
+      supabaseProducts.map((product) => sanitizePublicProduct(product as unknown as Record<string, unknown>))
     );
   } catch {
-    return NextResponse.json(
-      mergeWithListedProducts([], filters).map((product) =>
-        sanitizePublicProduct(product as unknown as Record<string, unknown>)
-      )
-    );
+    return NextResponse.json({ error: 'Erro ao carregar produtos' }, { status: 500 });
   }
 }
 

@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { isAuthenticated } from '@/lib/auth';
 import { normalizeProductPayload, parseProductId, parseMedia, sanitizePublicProduct } from '@/lib/products';
-import { getListedProductById } from '@/lib/catalog';
 
 export async function GET(
   _request: Request,
@@ -29,29 +28,13 @@ export async function GET(
     const { data, error } = await query.single();
 
     if (error || !data) {
-      const listedProduct = getListedProductById(productId);
-      if (listedProduct) {
-        return NextResponse.json(
-          authenticated
-            ? listedProduct
-            : sanitizePublicProduct(listedProduct as unknown as Record<string, unknown>)
-        );
-      }
       return NextResponse.json({ error: 'Produto não encontrado' }, { status: 404 });
     }
 
     const parsed = parseMedia(data);
     return NextResponse.json(authenticated ? parsed : sanitizePublicProduct(parsed));
   } catch {
-    const listedProduct = getListedProductById(productId);
-    if (listedProduct) {
-      return NextResponse.json(
-        authenticated
-          ? listedProduct
-          : sanitizePublicProduct(listedProduct as unknown as Record<string, unknown>)
-      );
-    }
-    return NextResponse.json({ error: 'Produto não encontrado' }, { status: 404 });
+    return NextResponse.json({ error: 'Erro ao carregar produto' }, { status: 500 });
   }
 }
 

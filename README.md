@@ -40,7 +40,7 @@ O admin falha fechado se `JWT_SECRET`, `ADMIN_EMAIL` e `ADMIN_PASSWORD` não est
 
 O schema base está em `supabase/schema.sql`. Ele cria a tabela `products`, índices principais, trigger de `updated_at` e bucket público `product-media`.
 
-O catálogo público tem fallback estático em `src/data/listed-products.ts`, então `/loja` e `/api/products` continuam funcionando localmente mesmo sem Supabase configurado. O fluxo admin completo precisa das variáveis de Supabase, autenticação e `GEMINI_API_KEY`.
+O catálogo público lê os produtos reais da tabela `products`. Sem Supabase configurado, `/loja` fica vazia e `/api/products` retorna erro em vez de exibir anúncios de exemplo. O fluxo admin completo precisa das variáveis de Supabase, autenticação e `GEMINI_API_KEY`.
 
 ## Deploy
 
