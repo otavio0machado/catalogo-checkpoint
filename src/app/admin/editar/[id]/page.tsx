@@ -19,8 +19,7 @@ export default function EditarProdutoPage({ params }: { params: Promise<{ id: st
         const data = await res.json();
         setProduct(data);
       } catch {
-        alert('Produto não encontrado');
-        router.push('/admin');
+        router.replace('/admin?erro=produto-nao-encontrado');
       } finally {
         setLoading(false);
       }
@@ -36,9 +35,8 @@ export default function EditarProdutoPage({ params }: { params: Promise<{ id: st
     });
 
     if (!res.ok) {
-      const err = await res.json();
-      alert(err.error || 'Erro ao salvar');
-      return;
+      const err = await res.json().catch(() => null);
+      throw new Error(err?.error || 'Erro ao salvar');
     }
 
     router.push('/admin');
@@ -47,7 +45,7 @@ export default function EditarProdutoPage({ params }: { params: Promise<{ id: st
   if (loading) {
     return (
       <div className="flex justify-center py-16">
-        <div className="w-8 h-8 border-4 border-navy-400 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-brand-400 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }

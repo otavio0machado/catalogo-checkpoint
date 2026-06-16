@@ -2,8 +2,13 @@ export function hasKnownPrice(cents: number): boolean {
   return cents > 0;
 }
 
+const BRL_DECIMAL = new Intl.NumberFormat('pt-BR', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
 export function formatCurrency(cents: number): string {
-  return (cents / 100).toFixed(2).replace('.', ',');
+  return BRL_DECIMAL.format(cents / 100);
 }
 
 export function formatPriceLabel(cents: number): string {

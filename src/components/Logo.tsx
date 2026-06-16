@@ -16,12 +16,12 @@ export default function Logo({ size = 'default' }: { size?: 'default' | 'large' 
   const textSize = size === 'large' ? 'text-2xl' : 'text-lg';
 
   return (
-    <Link href="/" className="flex items-center gap-2 text-white hover:text-navy-200 transition-colors">
-      <span className="grid place-items-center rounded-xl bg-gradient-to-b from-navy-200 to-navy-700 text-warm-900 shadow-[0_8px_24px_rgba(255,138,18,.25)]">
+    <Link href="/" className="flex items-center gap-2 text-white hover:text-brand-200 transition-colors">
+      <span className="grid place-items-center rounded-xl bg-gradient-to-b from-brand-200 to-brand-700 text-warm-900 shadow-[0_8px_24px_rgba(255,138,18,.25)]">
         <PinIcon className={iconSize} />
       </span>
       <span className={`font-black uppercase tracking-[0.04em] ${textSize}`}>
-        Check<span className="text-navy-300">point</span>
+        Check<span className="text-brand-300">point</span>
       </span>
     </Link>
   );

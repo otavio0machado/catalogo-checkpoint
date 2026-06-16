@@ -5,7 +5,7 @@ import {
   normalizeProductPayload,
   parseProductStatus,
   parseMedia,
-  sanitizeSearchTerm,
+  applyProductFilters,
 } from '@/lib/products';
 
 export async function GET(request: Request) {
@@ -16,11 +16,6 @@ export async function GET(request: Request) {
 
   try {
     const { searchParams } = new URL(request.url);
-    const search = sanitizeSearchTerm(searchParams.get('search') || '');
-    const type = searchParams.get('type') || '';
-    const platform = searchParams.get('platform') || '';
-    const genre = searchParams.get('genre') || '';
-    const condition = searchParams.get('condition') || '';
     const status = parseProductStatus(searchParams.get('status'));
 
     if (status === null) {
@@ -34,15 +29,13 @@ export async function GET(request: Request) {
       .order('created_at', { ascending: false });
 
     if (status) query = query.eq('status', status);
-    if (type) query = query.eq('type', type);
-    if (platform) query = query.eq('platform', platform);
-    if (genre) query = query.eq('genre', genre);
-    if (condition) query = query.eq('condition', condition);
-    if (search) {
-      query = query.or(
-        `title.ilike.%${search}%,platform.ilike.%${search}%,brand.ilike.%${search}%,publisher.ilike.%${search}%,genre.ilike.%${search}%,sku.ilike.%${search}%,description.ilike.%${search}%`
-      );
-    }
+    query = applyProductFilters(query, {
+      search: searchParams.get('search') || '',
+      type: searchParams.get('type') || '',
+      platform: searchParams.get('platform') || '',
+      genre: searchParams.get('genre') || '',
+      condition: searchParams.get('condition') || '',
+    });
 
     const { data, error } = await query;
 

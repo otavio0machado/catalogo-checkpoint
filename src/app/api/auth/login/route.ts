@@ -2,6 +2,11 @@ import { NextResponse } from 'next/server';
 import { validateCredentials, createToken, setAuthCookie } from '@/lib/auth';
 import { hasAdminAuthConfig } from '@/lib/auth-core';
 
+// Rate limit em memória: vale por instância do processo. Em deploy serverless
+// com múltiplas instâncias (ex.: Vercel) é apenas a primeira camada — a
+// proteção principal contra brute-force é a senha forte + comparação em tempo
+// constante (ver lib/auth-core). Para um limite global, mover este estado para
+// um store compartilhado (Redis/Upstash ou tabela no Supabase).
 const WINDOW_MS = 60 * 1000;
 const MAX_ATTEMPTS = 8;
 const attempts = new Map<string, { count: number; resetAt: number }>();

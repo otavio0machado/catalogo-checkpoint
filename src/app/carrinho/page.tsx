@@ -14,7 +14,7 @@ export default function CarrinhoPage() {
     <div className="min-h-screen bg-[#111] text-white">
       <header className="sticky top-0 z-40 border-b border-white/10 bg-[#111]/90 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-2xl items-center px-5">
-          <Link href="/loja" className="text-sm font-bold text-warm-300 hover:text-navy-200">
+          <Link href="/loja" className="text-sm font-bold text-warm-300 hover:text-brand-200">
             continuar olhando
           </Link>
         </div>
@@ -26,7 +26,7 @@ export default function CarrinhoPage() {
         {items.length === 0 ? (
           <div className="py-20 text-center">
             <p className="text-lg font-semibold text-warm-300">Seu carrinho está vazio</p>
-            <Link href="/loja" className="mt-3 inline-block text-sm font-black text-navy-300 hover:underline">
+            <Link href="/loja" className="mt-3 inline-block text-sm font-black text-brand-300 hover:underline">
               Ver catálogo
             </Link>
           </div>
@@ -41,7 +41,7 @@ export default function CarrinhoPage() {
                   <div className="min-w-0 flex-1">
                     <h2 className="line-clamp-2 text-sm font-black text-white">{item.title}</h2>
                     <p className="truncate text-xs text-warm-400">{item.platform} · {item.condition_detail}</p>
-                    <p className="mt-1 text-sm font-black text-navy-300">{formatPriceLabel(item.price_cents)}</p>
+                    <p className="mt-1 text-sm font-black text-brand-300">{formatPriceLabel(item.price_cents)}</p>
                   </div>
                   <button
                     onClick={() => removeItem(item.productId)}

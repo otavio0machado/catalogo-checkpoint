@@ -15,9 +15,8 @@ export default function NovoProdutoPage() {
     });
 
     if (!res.ok) {
-      const err = await res.json();
-      alert(err.error || 'Erro ao salvar');
-      return;
+      const err = await res.json().catch(() => null);
+      throw new Error(err?.error || 'Erro ao salvar');
     }
 
     router.push('/admin');

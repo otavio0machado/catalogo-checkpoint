@@ -28,8 +28,8 @@ export default function ConditionSelector({ value, onChange, required }: Conditi
             key={c}
             className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition ${
               value === c
-                ? 'border-navy-400 bg-navy-400/10'
-                : 'border-white/10 hover:border-navy-400/60 bg-white/[0.03]'
+                ? 'border-brand-400 bg-brand-400/10'
+                : 'border-white/10 hover:border-brand-400/60 bg-white/[0.03]'
             }`}
           >
             <input
@@ -38,7 +38,7 @@ export default function ConditionSelector({ value, onChange, required }: Conditi
               value={c}
               checked={value === c}
               onChange={(e) => onChange(e.target.value)}
-              className="w-4 h-4 text-navy-700"
+              className="w-4 h-4 text-brand-700"
             />
             <span className="text-sm text-warm-100">{c}</span>
           </label>

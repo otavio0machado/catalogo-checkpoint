@@ -18,10 +18,10 @@ export default function CartButton() {
   return (
     <Link
       href="/carrinho"
-      className="fixed bottom-5 right-4 sm:bottom-6 sm:right-5 z-50 bg-navy-400 text-[#111] h-12 sm:h-12 pl-4 pr-3 rounded-full shadow-lg flex items-center gap-2 hover:bg-navy-300 active:scale-95 transition-all"
+      className="fixed bottom-5 right-4 sm:bottom-6 sm:right-5 z-50 bg-brand-400 text-[#111] h-12 sm:h-12 pl-4 pr-3 rounded-full shadow-lg flex items-center gap-2 hover:bg-brand-300 active:scale-95 transition-all"
     >
       <span className="text-sm font-medium">Carrinho</span>
-      <span className="bg-[#111] text-navy-300 text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center">
+      <span className="bg-[#111] text-brand-300 text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center">
         {totalItems}
       </span>
     </Link>

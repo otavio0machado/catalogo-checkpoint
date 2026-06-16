@@ -21,10 +21,10 @@ export default function AdminNav() {
     <header className="sticky top-0 z-40 border-b border-white/10 bg-[#111]/95 backdrop-blur">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-5">
         <Link href="/admin" className="text-sm font-black uppercase tracking-wide text-white">
-          Check<span className="text-navy-300">point</span> <span className="font-medium text-warm-500">admin</span>
+          Check<span className="text-brand-300">point</span> <span className="font-medium text-warm-500">admin</span>
         </Link>
         <div className="flex items-center gap-3">
-          <Link href="/loja" className="text-xs font-bold text-warm-400 hover:text-navy-200">
+          <Link href="/loja" className="text-xs font-bold text-warm-400 hover:text-brand-200">
             ver site
           </Link>
           <button onClick={handleLogout} className="rounded-lg px-3 py-1.5 text-xs font-bold text-red-300 hover:bg-red-500/10">
@@ -39,7 +39,7 @@ export default function AdminNav() {
             href={link.href}
             className={`rounded-t-lg px-3 py-2 text-xs font-bold transition ${
               pathname === link.href
-                ? 'bg-white/[0.08] text-navy-300'
+                ? 'bg-white/[0.08] text-brand-300'
                 : 'text-warm-500 hover:text-warm-200'
             }`}
           >

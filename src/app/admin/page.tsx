@@ -17,6 +17,8 @@ export default function AdminDashboard() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
+  const [pendingDelete, setPendingDelete] = useState<Product | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     fetchProducts();
@@ -53,23 +55,28 @@ export default function AdminDashboard() {
     }
   }
 
-  async function handleDelete(id: number) {
-    if (!confirm('Tem certeza que deseja excluir este produto?')) return;
+  async function confirmDelete() {
+    if (!pendingDelete) return;
+    const id = pendingDelete.id;
 
     try {
+      setDeleting(true);
       setErrorMessage('');
       const res = await fetch(`/api/admin/products/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Erro ao excluir produto');
       setProducts((prev) => prev.filter((product) => product.id !== id));
+      setPendingDelete(null);
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : 'Erro ao excluir produto');
+    } finally {
+      setDeleting(false);
     }
   }
 
   if (loading) {
     return (
       <div className="flex justify-center py-16">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-navy-400 border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-400 border-t-transparent" />
       </div>
     );
   }
@@ -98,7 +105,7 @@ export default function AdminDashboard() {
           <h1 className="text-2xl font-black uppercase tracking-normal">Produtos</h1>
           <p className="text-sm text-warm-500">Inventário da Checkpoint Games.</p>
         </div>
-        <Link href="/admin/novo" className="inline-flex items-center justify-center rounded-xl bg-navy-400 px-4 py-2.5 text-sm font-black text-[#111] hover:bg-navy-300">
+        <Link href="/admin/novo" className="inline-flex items-center justify-center rounded-xl bg-brand-400 px-4 py-2.5 text-sm font-black text-[#111] hover:bg-brand-300">
           + Novo produto
         </Link>
       </div>
@@ -106,7 +113,7 @@ export default function AdminDashboard() {
       {products.length === 0 ? (
         <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-8 text-center">
           <p className="text-warm-300">Nenhum produto cadastrado ainda.</p>
-          <Link href="/admin/novo" className="mt-2 inline-block text-sm font-black text-navy-300 hover:underline">
+          <Link href="/admin/novo" className="mt-2 inline-block text-sm font-black text-brand-300 hover:underline">
             Adicionar primeiro produto
           </Link>
         </div>
@@ -128,19 +135,55 @@ export default function AdminDashboard() {
                       </span>
                     </div>
                     <p className="truncate text-xs text-warm-500">{product.platform} · {product.type} · {product.sku}</p>
-                    <p className="mt-1 text-sm font-black text-navy-300">{formatPriceLabel(product.price_cents)}</p>
+                    <p className="mt-1 text-sm font-black text-brand-300">{formatPriceLabel(product.price_cents)}</p>
                   </div>
                   <div className="flex shrink-0 items-center gap-1">
-                    <button onClick={() => updateStatus(product.id, 'available')} className="AdminIconButton" title="Marcar disponível">D</button>
-                    <button onClick={() => updateStatus(product.id, 'reserved')} className="AdminIconButton" title="Marcar reservado">R</button>
-                    <button onClick={() => updateStatus(product.id, 'sold')} className="AdminIconButton" title="Marcar vendido">V</button>
-                    <Link href={`/admin/editar/${product.id}`} className="AdminIconButton" title="Editar">E</Link>
-                    <button onClick={() => handleDelete(product.id)} className="AdminIconButton text-red-300" title="Excluir">×</button>
+                    <button onClick={() => updateStatus(product.id, 'available')} className="AdminIconButton" title="Marcar disponível" aria-label="Marcar como disponível">D</button>
+                    <button onClick={() => updateStatus(product.id, 'reserved')} className="AdminIconButton" title="Marcar reservado" aria-label="Marcar como reservado">R</button>
+                    <button onClick={() => updateStatus(product.id, 'sold')} className="AdminIconButton" title="Marcar vendido" aria-label="Marcar como vendido">V</button>
+                    <Link href={`/admin/editar/${product.id}`} className="AdminIconButton" title="Editar" aria-label="Editar produto">E</Link>
+                    <button onClick={() => setPendingDelete(product)} className="AdminIconButton text-red-300" title="Excluir" aria-label="Excluir produto">×</button>
                   </div>
                 </div>
               </div>
             );
           })}
+        </div>
+      )}
+
+      {pendingDelete && (
+        <div
+          className="fixed inset-0 z-50 grid place-items-center bg-black/70 p-5"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="delete-dialog-title"
+          onClick={() => !deleting && setPendingDelete(null)}
+        >
+          <div
+            className="w-full max-w-sm rounded-2xl border border-white/10 bg-[#181818] p-5"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <h2 id="delete-dialog-title" className="text-lg font-black text-white">Excluir produto</h2>
+            <p className="mt-2 text-sm text-warm-300">
+              Tem certeza que deseja excluir <span className="font-bold text-white">{pendingDelete.title}</span>? Esta ação não pode ser desfeita.
+            </p>
+            <div className="mt-5 flex justify-end gap-2">
+              <button
+                onClick={() => setPendingDelete(null)}
+                disabled={deleting}
+                className="rounded-xl px-4 py-2.5 text-sm font-bold text-warm-300 hover:bg-white/5 disabled:opacity-50"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={confirmDelete}
+                disabled={deleting}
+                className="rounded-xl bg-red-500/90 px-4 py-2.5 text-sm font-black text-white hover:bg-red-500 disabled:opacity-50"
+              >
+                {deleting ? 'Excluindo...' : 'Excluir'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -2,27 +2,13 @@
 
 import { useState } from 'react';
 import type { MediaItem, Product, ProductAIAnalysis, ProductStatus, StoreStock } from '@/types';
-import { STORES, parseStoreStock, totalStoreStock } from '@/lib/products';
+import { STORES, extractMediaItems, parseStoreStock, totalStoreStock } from '@/lib/products';
 import MediaUploader from './MediaUploader';
 import ConditionSelector from './ConditionSelector';
 
 const TYPES: Product['type'][] = ['Jogo', 'Console', 'Acessório', 'Colecionável', 'Gift Card', 'Outro'];
 const FORMATS = ['Disco', 'Cartucho', 'Digital', 'Código', 'Console', 'Acessório', 'Colecionável'];
 const STATUSES: ProductStatus[] = ['available', 'reserved', 'sold', 'hidden'];
-
-function parseMedia(product?: Partial<Product>): MediaItem[] {
-  if (!product) return [];
-  if (Array.isArray(product.media) && product.media.length > 0) return product.media;
-  if (typeof product.media === 'string') {
-    try {
-      return JSON.parse(product.media);
-    } catch {
-      return [];
-    }
-  }
-  if (product.photo_url) return [{ url: product.photo_url, type: 'image', path: '' }];
-  return [];
-}
 
 interface ProductFormProps {
   initialData?: Partial<Product>;
@@ -32,12 +18,13 @@ interface ProductFormProps {
 
 export default function ProductForm({ initialData, onSubmit, submitLabel = 'Salvar produto' }: ProductFormProps) {
   const requiresAnalysis = !initialData?.id;
-  const [media, setMedia] = useState<MediaItem[]>(parseMedia(initialData));
+  const [media, setMedia] = useState<MediaItem[]>(extractMediaItems(initialData));
   const [saving, setSaving] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState<ProductAIAnalysis | null>(null);
   const [analysisApplied, setAnalysisApplied] = useState(Boolean(initialData?.id));
   const [analysisError, setAnalysisError] = useState('');
+  const [formError, setFormError] = useState('');
   const [priceDisplay, setPriceDisplay] = useState(
     initialData?.price_cents ? (initialData.price_cents / 100).toFixed(2) : ''
   );
@@ -118,7 +105,7 @@ export default function ProductForm({ initialData, onSubmit, submitLabel = 'Salv
   async function handleAnalyze() {
     const firstImage = media.find((item) => item.type === 'image');
     if (!firstImage) {
-      alert('Tire ou envie pelo menos uma foto antes de analisar.');
+      setAnalysisError('Tire ou envie pelo menos uma foto antes de analisar.');
       return;
     }
 
@@ -184,12 +171,13 @@ export default function ProductForm({ initialData, onSubmit, submitLabel = 'Salv
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
+    setFormError('');
     if (!form.title || !form.platform || !form.condition_detail) {
-      alert('Preencha título, plataforma e condição.');
+      setFormError('Preencha título, plataforma e condição.');
       return;
     }
     if (requiresAnalysis && !analysisApplied) {
-      alert('Analise a foto com IA e aplique a sugestão antes de publicar.');
+      setFormError('Analise a foto com IA e aplique a sugestão antes de publicar.');
       return;
     }
 
@@ -200,6 +188,8 @@ export default function ProductForm({ initialData, onSubmit, submitLabel = 'Salv
         media,
         photo_url: media[0]?.url || form.photo_url || '',
       });
+    } catch (error) {
+      setFormError(error instanceof Error ? error.message : 'Erro ao salvar o produto.');
     } finally {
       setSaving(false);
     }
@@ -209,10 +199,10 @@ export default function ProductForm({ initialData, onSubmit, submitLabel = 'Salv
     <form onSubmit={handleSubmit} className="space-y-6">
       <FormSection title="Mídia">
         <MediaUploader items={media} onChange={handleMediaChange} />
-        <div className="rounded-xl border border-navy-400/20 bg-navy-400/10 p-4">
+        <div className="rounded-xl border border-brand-400/20 bg-brand-400/10 p-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-sm font-black text-navy-300">1. Tire a foto  2. Analise com IA  3. Revise  4. Publique</p>
+              <p className="text-sm font-black text-brand-300">1. Tire a foto  2. Analise com IA  3. Revise  4. Publique</p>
               <p className="mt-1 text-xs text-warm-400">
                 A publicação de um novo produto exige análise aplicada antes do botão final.
               </p>
@@ -221,7 +211,7 @@ export default function ProductForm({ initialData, onSubmit, submitLabel = 'Salv
               type="button"
               onClick={handleAnalyze}
               disabled={analyzing || !media.some((item) => item.type === 'image')}
-              className="rounded-xl bg-navy-400 px-4 py-3 text-sm font-black text-[#111] transition hover:bg-navy-300 disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-xl bg-brand-400 px-4 py-3 text-sm font-black text-[#111] transition hover:bg-brand-300 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {analyzing ? 'Analisando...' : 'Analisar com IA'}
             </button>
@@ -302,7 +292,13 @@ export default function ProductForm({ initialData, onSubmit, submitLabel = 'Salv
         </div>
       </FormSection>
 
-      <button disabled={saving} className="w-full rounded-xl bg-navy-400 px-5 py-4 text-base font-black text-[#111] transition hover:bg-navy-300 disabled:opacity-50">
+      {formError && (
+        <p role="alert" className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+          {formError}
+        </p>
+      )}
+
+      <button disabled={saving} className="w-full rounded-xl bg-brand-400 px-5 py-4 text-base font-black text-[#111] transition hover:bg-brand-300 disabled:opacity-50">
         {saving ? 'Salvando...' : submitLabel}
       </button>
     </form>
@@ -385,7 +381,7 @@ function Suggestion({ label, value }: { label: string; value: string }) {
 function FormSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="space-y-4 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-      <h2 className="text-sm font-black uppercase tracking-wide text-navy-300">{title}</h2>
+      <h2 className="text-sm font-black uppercase tracking-wide text-brand-300">{title}</h2>
       {children}
     </section>
   );
@@ -418,7 +414,7 @@ function Input({
         required={required}
         placeholder={placeholder}
         onChange={(event) => onChange(event.target.value)}
-        className="w-full rounded-xl border border-white/10 bg-[#151515] px-4 py-3 text-sm text-white outline-none transition placeholder:text-warm-600 focus:border-navy-400 focus:ring-2 focus:ring-navy-400/20"
+        className="w-full rounded-xl border border-white/10 bg-[#151515] px-4 py-3 text-sm text-white outline-none transition placeholder:text-warm-500 focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20"
       />
     </label>
   );
@@ -431,7 +427,7 @@ function Select({ label, value, onChange, options }: { label: string; value: str
       <select
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="w-full rounded-xl border border-white/10 bg-[#151515] px-4 py-3 text-sm text-white outline-none transition focus:border-navy-400 focus:ring-2 focus:ring-navy-400/20"
+        className="w-full rounded-xl border border-white/10 bg-[#151515] px-4 py-3 text-sm text-white outline-none transition focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20"
       >
         {options.map((option) => (
           <option key={option} value={option}>
@@ -451,7 +447,7 @@ function Textarea({ label, value, onChange, rows }: { label: string; value: stri
         value={value}
         rows={rows}
         onChange={(event) => onChange(event.target.value)}
-        className="w-full resize-none rounded-xl border border-white/10 bg-[#151515] px-4 py-3 text-sm text-white outline-none transition placeholder:text-warm-600 focus:border-navy-400 focus:ring-2 focus:ring-navy-400/20"
+        className="w-full resize-none rounded-xl border border-white/10 bg-[#151515] px-4 py-3 text-sm text-white outline-none transition placeholder:text-warm-500 focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20"
       />
     </label>
   );
