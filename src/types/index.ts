@@ -22,7 +22,6 @@ export interface Product {
   condition: string;
   condition_detail: string;
   condition_notes: string;
-  includes: string;
   description: string;
   price_cents: number;
   compare_at_price_cents: number | null;
@@ -30,9 +29,6 @@ export interface Product {
   store_stock: StoreStock;
   sku: string;
   age_rating: string;
-  players: string;
-  online_support: string;
-  warranty_notes: string;
   weight_kg: number;
   width_cm: number;
   length_cm: number;
@@ -65,15 +61,11 @@ export interface ProductAIAnalysis {
   region: string;
   condition_detail: string;
   condition_notes: string;
-  includes: string;
   description: string;
   suggested_price_cents: number;
   compare_at_price_cents: number | null;
   sku: string;
   age_rating: string;
-  players: string;
-  online_support: string;
-  warranty_notes: string;
   weight_kg: number;
   width_cm: number;
   length_cm: number;

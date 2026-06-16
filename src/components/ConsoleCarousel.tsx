@@ -37,13 +37,13 @@ const featuredConsoles = [
   {
     name: 'Xbox One S',
     label: 'Xbox One S',
-    src: '/assets/consoles/xbox-one-s.jpg',
+    src: '/assets/consoles/xbox-one-s.webp',
     imageClassName: 'p-6 pb-24 sm:p-8 sm:pb-28',
   },
   {
     name: 'Xbox One com Kinect',
     label: 'Xbox One + Kinect',
-    src: '/assets/consoles/xbox-one-kinect.jpg',
+    src: '/assets/consoles/xbox-one-kinect.webp',
     imageClassName: 'p-5 pb-24 sm:p-7 sm:pb-28',
   },
   {
@@ -67,7 +67,7 @@ const featuredConsoles = [
   {
     name: 'Nintendo 3DS',
     label: 'Nintendo 3DS',
-    src: '/assets/consoles/nintendo-3ds.jpg',
+    src: '/assets/consoles/nintendo-3ds.webp',
     imageClassName: 'p-5 pb-24 sm:p-7 sm:pb-28',
   },
 ] as const;

@@ -181,10 +181,6 @@ export default async function ProdutoPage({ params }: { params: Promise<{ id: st
               ['SKU', product.sku],
               ['Estoque', totalStock > 0 ? `${totalStock}` : ''],
               ['Classificação', product.age_rating],
-              ['Jogadores', product.players],
-              ['Online', product.online_support],
-              ['Incluso', product.includes],
-              ['Garantia', product.warranty_notes],
             ].map(([label, value]) => (
               value ? (
                 <div key={label}>

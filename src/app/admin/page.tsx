@@ -137,12 +137,39 @@ export default function AdminDashboard() {
                     <p className="truncate text-xs text-warm-500">{product.platform} · {product.type} · {product.sku}</p>
                     <p className="mt-1 text-sm font-black text-brand-300">{formatPriceLabel(product.price_cents)}</p>
                   </div>
-                  <div className="flex shrink-0 items-center gap-1">
-                    <button onClick={() => updateStatus(product.id, 'available')} className="AdminIconButton" title="Marcar disponível" aria-label="Marcar como disponível">D</button>
-                    <button onClick={() => updateStatus(product.id, 'reserved')} className="AdminIconButton" title="Marcar reservado" aria-label="Marcar como reservado">R</button>
-                    <button onClick={() => updateStatus(product.id, 'sold')} className="AdminIconButton" title="Marcar vendido" aria-label="Marcar como vendido">V</button>
-                    <Link href={`/admin/editar/${product.id}`} className="AdminIconButton" title="Editar" aria-label="Editar produto">E</Link>
-                    <button onClick={() => setPendingDelete(product)} className="AdminIconButton text-red-300" title="Excluir" aria-label="Excluir produto">×</button>
+                  <div className="flex shrink-0 items-center gap-2">
+                    <label htmlFor={`status-${product.id}`} className="sr-only">
+                      Status de {product.title}
+                    </label>
+                    <select
+                      id={`status-${product.id}`}
+                      value={product.status}
+                      onChange={(event) => updateStatus(product.id, event.target.value as ProductStatus)}
+                      title="Alterar status"
+                      className="rounded-lg border border-white/10 bg-[#151515] px-2.5 py-2 text-xs font-bold text-warm-100 outline-none transition focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20"
+                    >
+                      {(Object.keys(STATUS_LABELS) as ProductStatus[]).map((status) => (
+                        <option key={status} value={status}>
+                          {STATUS_LABELS[status].label}
+                        </option>
+                      ))}
+                    </select>
+                    <Link
+                      href={`/admin/editar/${product.id}`}
+                      className="AdminIconButton"
+                      title="Editar produto"
+                      aria-label={`Editar ${product.title}`}
+                    >
+                      <PencilIcon />
+                    </Link>
+                    <button
+                      onClick={() => setPendingDelete(product)}
+                      className="AdminIconButton text-red-300"
+                      title="Excluir produto"
+                      aria-label={`Excluir ${product.title}`}
+                    >
+                      <TrashIcon />
+                    </button>
                   </div>
                 </div>
               </div>
@@ -187,6 +214,22 @@ export default function AdminDashboard() {
         </div>
       )}
     </div>
+  );
+}
+
+function PencilIcon() {
+  return (
+    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-5m-1.414-9.414a2 2 0 1 1 2.828 2.828L11.828 15H9v-2.828l8.586-8.586Z" />
+    </svg>
+  );
+}
+
+function TrashIcon() {
+  return (
+    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0 1 16.138 21H7.862a2 2 0 0 1-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v3M4 7h16" />
+    </svg>
   );
 }
 
