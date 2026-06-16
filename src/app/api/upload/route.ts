@@ -4,11 +4,9 @@ import { isAuthenticated } from '@/lib/auth';
 import { v4 as uuidv4 } from 'uuid';
 
 const IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-const VIDEO_TYPES = ['video/mp4', 'video/quicktime', 'video/webm'];
-const ALLOWED_TYPES = [...IMAGE_TYPES, ...VIDEO_TYPES];
+const ALLOWED_TYPES = [...IMAGE_TYPES];
 
 const MAX_IMAGE_SIZE = 10 * 1024 * 1024;  // 10MB
-const MAX_VIDEO_SIZE = 50 * 1024 * 1024;  // 50MB
 
 export async function POST(request: Request) {
   const authenticated = await isAuthenticated();
@@ -26,22 +24,19 @@ export async function POST(request: Request) {
 
     if (!ALLOWED_TYPES.includes(file.type)) {
       return NextResponse.json(
-        { error: 'Tipo não permitido. Use JPG, PNG, WebP, MP4, MOV ou WebM.' },
+        { error: 'Tipo não permitido. Use JPG, PNG ou WebP.' },
         { status: 400 }
       );
     }
 
-    const isVideo = VIDEO_TYPES.includes(file.type);
-    const maxSize = isVideo ? MAX_VIDEO_SIZE : MAX_IMAGE_SIZE;
-
-    if (file.size > maxSize) {
+    if (file.size > MAX_IMAGE_SIZE) {
       return NextResponse.json(
-        { error: `Arquivo muito grande. Máximo ${isVideo ? '50' : '10'}MB.` },
+        { error: 'Arquivo muito grande. Máximo 10MB.' },
         { status: 400 }
       );
     }
 
-    const ext = file.name.split('.').pop() || (isVideo ? 'mp4' : 'jpg');
+    const ext = file.name.split('.').pop() || 'jpg';
     const fileName = `${uuidv4()}.${ext}`;
     const buffer = Buffer.from(await file.arrayBuffer());
 
@@ -64,7 +59,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       path: fileName,
       url: urlData.publicUrl,
-      type: isVideo ? 'video' : 'image',
+      type: 'image',
     });
   } catch {
     return NextResponse.json({ error: 'Erro ao fazer upload' }, { status: 500 });

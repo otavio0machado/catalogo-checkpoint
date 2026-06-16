@@ -9,21 +9,16 @@ interface MediaUploaderProps {
   onChange: (items: MediaItem[]) => void;
 }
 
-const MAX_IMAGES = 9;
-const MAX_VIDEOS = 1;
+const MAX_IMAGES = 2;
 
 export default function MediaUploader({ items, onChange }: MediaUploaderProps) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
-  const videoInputRef = useRef<HTMLInputElement>(null);
 
   const imageCount = items.filter((i) => i.type === 'image').length;
-  const videoCount = items.filter((i) => i.type === 'video').length;
-  const canAddImage = imageCount < MAX_IMAGES;
-  const canAddVideo = videoCount < MAX_VIDEOS;
-  const canAddMore = canAddImage || canAddVideo;
+  const canAddMore = imageCount < MAX_IMAGES;
 
   async function resizeImage(file: File): Promise<{ blob: Blob; base64: string }> {
     return new Promise((resolve, reject) => {
@@ -81,16 +76,10 @@ export default function MediaUploader({ items, onChange }: MediaUploaderProps) {
   }
 
   async function uploadFile(file: File): Promise<MediaItem | null> {
-    const isVideo = file.type.startsWith('video/');
-    let fileToUpload: Blob = file;
-
-    if (!isVideo) {
-      const resized = await resizeImage(file);
-      fileToUpload = resized.blob;
-    }
+    const { blob } = await resizeImage(file);
 
     const formData = new FormData();
-    formData.append('file', fileToUpload, file.name);
+    formData.append('file', blob, file.name);
 
     const res = await fetch('/api/upload', { method: 'POST', body: formData });
     if (!res.ok) {
@@ -109,16 +98,13 @@ export default function MediaUploader({ items, onChange }: MediaUploaderProps) {
 
     const newItems: MediaItem[] = [];
     let currentImages = imageCount;
-    let currentVideos = videoCount;
 
     for (const file of Array.from(files)) {
-      const isVideo = file.type.startsWith('video/');
-
-      if (isVideo && currentVideos >= MAX_VIDEOS) {
-        setError(`Máximo ${MAX_VIDEOS} vídeo por anúncio.`);
+      if (file.type.startsWith('video/')) {
+        setError('Apenas fotos são permitidas.');
         continue;
       }
-      if (!isVideo && currentImages >= MAX_IMAGES) {
+      if (currentImages >= MAX_IMAGES) {
         setError(`Máximo ${MAX_IMAGES} fotos por anúncio.`);
         continue;
       }
@@ -127,8 +113,7 @@ export default function MediaUploader({ items, onChange }: MediaUploaderProps) {
         const item = await uploadFile(file);
         if (item) {
           newItems.push(item);
-          if (isVideo) currentVideos++;
-          else currentImages++;
+          currentImages++;
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Erro no upload');
@@ -164,15 +149,7 @@ export default function MediaUploader({ items, onChange }: MediaUploaderProps) {
         <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5 sm:gap-2 mb-3">
           {items.map((item, i) => (
             <div key={i} className="relative aspect-square rounded-xl overflow-hidden bg-white/[0.04] border border-white/10">
-              {item.type === 'image' ? (
-                <Image src={item.url} alt={`Mídia ${i + 1}`} fill className="object-cover" sizes="120px" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-warm-800">
-                  <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                </div>
-              )}
+              <Image src={item.url} alt={`Foto ${i + 1}`} fill className="object-cover" sizes="120px" />
               {i === 0 && (
                 <span className="absolute top-1 left-1 bg-brand-400 text-white text-[10px] px-1.5 py-0.5 rounded font-medium">
                   Capa
@@ -181,7 +158,7 @@ export default function MediaUploader({ items, onChange }: MediaUploaderProps) {
               <button
                 type="button"
                 onClick={() => removeItem(i)}
-                aria-label={`Remover mídia ${i + 1}`}
+                aria-label={`Remover foto ${i + 1}`}
                 className="absolute top-1 right-1 w-6 h-6 bg-black/60 text-white rounded-full flex items-center justify-center text-sm hover:bg-black/80"
               >
                 &times;
@@ -216,8 +193,8 @@ export default function MediaUploader({ items, onChange }: MediaUploaderProps) {
             <svg className="w-10 h-10 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
-            <p className="text-sm font-medium text-warm-400 mb-1">Adicione fotos e vídeos</p>
-            <p className="text-xs text-warm-400 mb-4">Até {MAX_IMAGES} fotos e {MAX_VIDEOS} vídeo</p>
+            <p className="text-sm font-medium text-warm-400 mb-1">Adicione fotos</p>
+            <p className="text-xs text-warm-400 mb-4">Até {MAX_IMAGES} fotos</p>
 
             {/* Action buttons */}
             <div className="flex flex-wrap gap-2 justify-center">
@@ -231,17 +208,6 @@ export default function MediaUploader({ items, onChange }: MediaUploaderProps) {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
                 Tirar foto
-              </button>
-
-              <button
-                type="button"
-                onClick={() => videoInputRef.current?.click()}
-                className="flex items-center gap-1.5 px-3 py-2 bg-warm-800 text-white rounded-lg text-sm font-medium hover:bg-warm-700 active:scale-95 transition-all"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                </svg>
-                Gravar vídeo
               </button>
 
               <button
@@ -269,31 +235,17 @@ export default function MediaUploader({ items, onChange }: MediaUploaderProps) {
       {/* Action buttons when items exist */}
       {items.length > 0 && canAddMore && !uploading && (
         <div className="flex flex-wrap gap-2 mt-2">
-          {canAddImage && (
-            <button
-              type="button"
-              onClick={() => cameraInputRef.current?.click()}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-brand-300 bg-brand-400/10 rounded-lg hover:bg-brand-400/20 active:scale-95 transition-all"
-            >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              Tirar foto
-            </button>
-          )}
-          {canAddVideo && (
-            <button
-              type="button"
-              onClick={() => videoInputRef.current?.click()}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-warm-200 bg-white/[0.04] rounded-lg hover:bg-warm-200 active:scale-95 transition-all"
-            >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-              </svg>
-              Gravar vídeo
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={() => cameraInputRef.current?.click()}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-brand-300 bg-brand-400/10 rounded-lg hover:bg-brand-400/20 active:scale-95 transition-all"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            Tirar foto
+          </button>
         </div>
       )}
 
@@ -310,7 +262,7 @@ export default function MediaUploader({ items, onChange }: MediaUploaderProps) {
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime,video/webm"
+        accept="image/jpeg,image/png,image/webp"
         multiple
         onChange={handleInputChange}
         className="hidden"
@@ -324,20 +276,11 @@ export default function MediaUploader({ items, onChange }: MediaUploaderProps) {
         onChange={handleInputChange}
         className="hidden"
       />
-      {/* Camera capture (video) */}
-      <input
-        ref={videoInputRef}
-        type="file"
-        accept="video/*"
-        capture="environment"
-        onChange={handleInputChange}
-        className="hidden"
-      />
 
       {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
 
       <p className="text-xs text-warm-400 mt-2">
-        {imageCount}/{MAX_IMAGES} fotos &middot; {videoCount}/{MAX_VIDEOS} vídeo
+        {imageCount}/{MAX_IMAGES} fotos
       </p>
     </div>
   );
