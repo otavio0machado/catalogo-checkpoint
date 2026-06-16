@@ -45,10 +45,6 @@ export default function ProductForm({ initialData, onSubmit, submitLabel = 'Salv
     stock: 1,
     sku: '',
     age_rating: '',
-    weight_kg: 0.2,
-    width_cm: 14,
-    length_cm: 17,
-    height_cm: 2,
     status: 'available',
     ...initialData,
     store_stock: parseStoreStock(initialData?.store_stock),
@@ -144,10 +140,6 @@ export default function ProductForm({ initialData, onSubmit, submitLabel = 'Salv
       price_cents: priceCents,
       sku: analysis.sku || prev.sku,
       age_rating: analysis.age_rating || prev.age_rating,
-      weight_kg: analysis.weight_kg || prev.weight_kg,
-      width_cm: analysis.width_cm || prev.width_cm,
-      length_cm: analysis.length_cm || prev.length_cm,
-      height_cm: analysis.height_cm || prev.height_cm,
     }));
     setPriceDisplay(priceCents ? (priceCents / 100).toFixed(2) : '');
     setAnalysisApplied(true);
@@ -214,27 +206,27 @@ export default function ProductForm({ initialData, onSubmit, submitLabel = 'Salv
       <FormSection title="Informações principais">
         <div className="grid gap-4 sm:grid-cols-2">
           <Input label="Título *" value={form.title || ''} onChange={(value) => updateField('title', value)} required />
-          <Input label="SKU" value={form.sku || ''} onChange={(value) => updateField('sku', value)} placeholder="CHK-PS5-001" />
-          <Select label="Tipo" value={form.type || 'Jogo'} onChange={(value) => updateField('type', value)} options={TYPES} />
           <Input label="Plataforma *" value={form.platform || ''} onChange={(value) => updateField('platform', value)} required placeholder="PS5, Nintendo Switch, Xbox..." />
-          <Input label="Marca" value={form.brand || ''} onChange={(value) => updateField('brand', value)} />
-          <Input label="Publisher" value={form.publisher || ''} onChange={(value) => updateField('publisher', value)} />
-          <Input label="Gênero" value={form.genre || ''} onChange={(value) => updateField('genre', value)} />
           <Select label="Formato" value={form.media_format || ''} onChange={(value) => updateField('media_format', value)} options={FORMATS} />
-          <Input label="Região" value={form.region || ''} onChange={(value) => updateField('region', value)} />
-          <Input label="Classificação" value={form.age_rating || ''} onChange={(value) => updateField('age_rating', value)} />
+          <Input label="Preço (R$)" value={priceDisplay} onChange={handlePriceChange} placeholder="149.90" />
         </div>
+
+        <DetailsAccordion title="Detalhes (preenchidos pela IA)">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Select label="Tipo" value={form.type || 'Jogo'} onChange={(value) => updateField('type', value)} options={TYPES} />
+            <Input label="SKU" value={form.sku || ''} onChange={(value) => updateField('sku', value)} placeholder="CHK-PS5-001" />
+            <Input label="Marca" value={form.brand || ''} onChange={(value) => updateField('brand', value)} />
+            <Input label="Publisher" value={form.publisher || ''} onChange={(value) => updateField('publisher', value)} />
+            <Input label="Gênero" value={form.genre || ''} onChange={(value) => updateField('genre', value)} />
+            <Input label="Região" value={form.region || ''} onChange={(value) => updateField('region', value)} />
+            <Input label="Classificação" value={form.age_rating || ''} onChange={(value) => updateField('age_rating', value)} />
+          </div>
+        </DetailsAccordion>
       </FormSection>
 
       <FormSection title="Condição">
         <ConditionSelector value={form.condition_detail || ''} onChange={(value) => updateField('condition_detail', value)} required />
         <Textarea label="Observações" value={form.condition_notes || ''} onChange={(value) => updateField('condition_notes', value)} rows={2} />
-      </FormSection>
-
-      <FormSection title="Venda">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Input label="Preço (R$)" value={priceDisplay} onChange={handlePriceChange} placeholder="149.90" />
-        </div>
       </FormSection>
 
       <FormSection title="Estoque por loja">
@@ -253,15 +245,6 @@ export default function ProductForm({ initialData, onSubmit, submitLabel = 'Salv
         <p className="text-sm text-warm-400">
           Estoque total: <span className="font-black text-white">{form.stock ?? 0}</span>
         </p>
-      </FormSection>
-
-      <FormSection title="Envio">
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <Input label="Peso (kg)" type="number" value={String(form.weight_kg ?? 0)} onChange={(value) => updateField('weight_kg', Number(value) || 0)} step="0.01" />
-          <Input label="Largura (cm)" type="number" value={String(form.width_cm ?? 0)} onChange={(value) => updateField('width_cm', Number(value) || 0)} step="0.1" />
-          <Input label="Comprimento (cm)" type="number" value={String(form.length_cm ?? 0)} onChange={(value) => updateField('length_cm', Number(value) || 0)} step="0.1" />
-          <Input label="Altura (cm)" type="number" value={String(form.height_cm ?? 0)} onChange={(value) => updateField('height_cm', Number(value) || 0)} step="0.1" />
-        </div>
       </FormSection>
 
       {formError && (
@@ -347,6 +330,27 @@ function Suggestion({ label, value }: { label: string; value: string }) {
       <p className="text-xs text-warm-500">{label}</p>
       <p className="mt-1 text-sm font-semibold text-warm-100">{value || 'Não identificado'}</p>
     </div>
+  );
+}
+
+function DetailsAccordion({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <details className="group rounded-xl border border-white/10 bg-[#151515]/40">
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-4 py-3 text-sm font-medium text-warm-300 transition hover:text-white">
+        <span>{title}</span>
+        <svg
+          className="h-4 w-4 shrink-0 text-warm-500 transition-transform group-open:rotate-90"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          aria-hidden="true"
+        >
+          <path d="M9 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </summary>
+      <div className="border-t border-white/10 p-4">{children}</div>
+    </details>
   );
 }
 

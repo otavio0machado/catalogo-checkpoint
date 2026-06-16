@@ -1,14 +1,6 @@
 'use client';
 
-const CONDITIONS = [
-  'Novo',
-  'Novo - lacrado',
-  'Usado - excelente estado',
-  'Usado - marcas leves',
-  'Usado - mídia com detalhes',
-  'Usado - sem caixa/manual',
-  'Reservado para avaliação',
-];
+const CONDITIONS = ['Novo', 'Usado'];
 
 interface ConditionSelectorProps {
   value: string;

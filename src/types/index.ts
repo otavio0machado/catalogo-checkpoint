@@ -29,10 +29,6 @@ export interface Product {
   store_stock: StoreStock;
   sku: string;
   age_rating: string;
-  weight_kg: number;
-  width_cm: number;
-  length_cm: number;
-  height_cm: number;
   photo_url: string;
   media: MediaItem[];
   status: ProductStatus;
@@ -66,10 +62,6 @@ export interface ProductAIAnalysis {
   compare_at_price_cents: number | null;
   sku: string;
   age_rating: string;
-  weight_kg: number;
-  width_cm: number;
-  length_cm: number;
-  height_cm: number;
   confidence: number;
   review_notes: string[];
 }
