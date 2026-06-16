@@ -33,7 +33,7 @@ export default function ProductCard({ product, priority = false }: { product: Pr
 
   return (
     <Link href={`/produto/${product.id}`} className="group block">
-      <div className="overflow-hidden rounded-xl border border-white/10 bg-[#181818] transition hover:-translate-y-0.5 hover:border-navy-400/70 hover:shadow-[0_16px_48px_rgba(255,138,18,.12)]">
+      <div className="overflow-hidden rounded-xl border border-white/10 bg-[#181818] transition hover:-translate-y-0.5 hover:border-brand-400/70 hover:shadow-[0_16px_48px_rgba(255,138,18,.12)]">
         <div className="relative aspect-square bg-[#101010]">
           {product.photo_url ? (
             <Image
@@ -45,10 +45,10 @@ export default function ProductCard({ product, priority = false }: { product: Pr
               sizes="(max-width: 640px) 50vw, 25vw"
             />
           ) : (
-            <div className="grid h-full place-items-center text-navy-300">Checkpoint</div>
+            <div className="grid h-full place-items-center text-brand-300">Checkpoint</div>
           )}
           {hasDiscount && (
-            <span className="absolute left-2 top-2 rounded-lg bg-navy-400 px-2 py-0.5 text-[10px] font-black text-[#111]">
+            <span className="absolute left-2 top-2 rounded-lg bg-brand-400 px-2 py-0.5 text-[10px] font-black text-[#111]">
               -{discount}%
             </span>
           )}
@@ -74,7 +74,7 @@ export default function ProductCard({ product, priority = false }: { product: Pr
                   R$ {formatCurrency(product.compare_at_price_cents!)}
                 </p>
               )}
-              <p className="whitespace-nowrap text-sm font-black text-navy-300">{formatPriceLabel(product.price_cents)}</p>
+              <p className="whitespace-nowrap text-sm font-black text-brand-300">{formatPriceLabel(product.price_cents)}</p>
             </div>
             <button
               onClick={handleAdd}
@@ -82,7 +82,7 @@ export default function ProductCard({ product, priority = false }: { product: Pr
               className={`min-h-8 rounded-lg px-2 text-[11px] font-bold transition ${
                 inCart
                   ? 'bg-white/10 text-warm-400'
-                  : 'bg-navy-400 text-[#111] hover:bg-navy-300 active:scale-95'
+                  : 'bg-brand-400 text-[#111] hover:bg-brand-300 active:scale-95'
               }`}
             >
               {inCart ? 'no carrinho' : '+ adicionar'}

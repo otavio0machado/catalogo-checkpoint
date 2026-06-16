@@ -54,7 +54,7 @@ export default function MediaGallery({ items }: { items: MediaItem[] }) {
               key={i}
               onClick={() => setSelected(i)}
               className={`relative w-[4.5rem] h-[4.5rem] sm:w-16 sm:h-16 rounded-xl overflow-hidden flex-shrink-0 border-2 transition ${
-                i === selected ? 'border-navy-600' : 'border-transparent opacity-60 hover:opacity-100'
+                i === selected ? 'border-brand-600' : 'border-transparent opacity-60 hover:opacity-100'
               }`}
             >
               {item.type === 'video' ? (

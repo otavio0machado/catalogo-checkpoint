@@ -5,7 +5,7 @@ import { useCart } from './CartProvider';
 
 export default function WhatsAppCheckout() {
   const { items, totalPrice, clearCart } = useCart();
-  const phone = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '5551999999999';
+  const phone = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER;
   const hasPendingPrices = items.some((item) => item.price_cents <= 0);
 
   function buildMessage(): string {
@@ -21,12 +21,22 @@ export default function WhatsAppCheckout() {
   }
 
   function handleCheckout() {
+    if (!phone) return;
     const url = `https://wa.me/${phone}?text=${encodeURIComponent(buildMessage())}`;
-    window.open(url, '_blank');
-    clearCart();
+    const opened = window.open(url, '_blank');
+    // Só esvazia o carrinho se a aba do WhatsApp realmente abriu.
+    if (opened) clearCart();
   }
 
   if (items.length === 0) return null;
+
+  if (!phone) {
+    return (
+      <p className="rounded-xl border border-yellow-500/20 bg-yellow-500/10 px-4 py-3 text-center text-sm text-yellow-200">
+        Checkout pelo WhatsApp indisponível no momento. Tente novamente mais tarde.
+      </p>
+    );
+  }
 
   return (
     <button

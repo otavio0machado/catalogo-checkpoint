@@ -10,9 +10,20 @@ const inter = Inter({
   display: "swap",
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+
 export const metadata: Metadata = {
-  title: "Checkpoint Games — catálogo gamer",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "Checkpoint Games — catálogo gamer",
+    template: "%s | Checkpoint Games",
+  },
   description: "Jogos, consoles e acessórios selecionados para reservar pelo WhatsApp na Checkpoint Games.",
+  openGraph: {
+    siteName: "Checkpoint Games",
+    locale: "pt_BR",
+    type: "website",
+  },
 };
 
 export const viewport: Viewport = {

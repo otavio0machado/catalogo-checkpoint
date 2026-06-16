@@ -26,8 +26,15 @@ export default function MediaUploader({ items, onChange }: MediaUploaderProps) {
   const canAddMore = canAddImage || canAddVideo;
 
   async function resizeImage(file: File): Promise<{ blob: Blob; base64: string }> {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       const img = document.createElement('img');
+      const objectUrl = URL.createObjectURL(file);
+      const cleanup = () => URL.revokeObjectURL(objectUrl);
+
+      img.onerror = () => {
+        cleanup();
+        reject(new Error('Não foi possível ler a imagem. Tente outro arquivo.'));
+      };
       img.onload = () => {
         const canvas = document.createElement('canvas');
         const MAX_SIZE = 1200;
@@ -43,22 +50,33 @@ export default function MediaUploader({ items, onChange }: MediaUploaderProps) {
         }
         canvas.width = width;
         canvas.height = height;
-        const ctx = canvas.getContext('2d')!;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          cleanup();
+          reject(new Error('Falha ao processar a imagem.'));
+          return;
+        }
         ctx.drawImage(img, 0, 0, width, height);
         canvas.toBlob(
           (blob) => {
+            cleanup();
+            if (!blob) {
+              reject(new Error('Falha ao comprimir a imagem.'));
+              return;
+            }
             const reader = new FileReader();
+            reader.onerror = () => reject(new Error('Falha ao ler a imagem comprimida.'));
             reader.onload = () => {
               const base64 = (reader.result as string).split(',')[1];
-              resolve({ blob: blob!, base64 });
+              resolve({ blob, base64 });
             };
-            reader.readAsDataURL(blob!);
+            reader.readAsDataURL(blob);
           },
           'image/jpeg',
           0.8
         );
       };
-      img.src = URL.createObjectURL(file);
+      img.src = objectUrl;
     });
   }
 
@@ -156,13 +174,14 @@ export default function MediaUploader({ items, onChange }: MediaUploaderProps) {
                 </div>
               )}
               {i === 0 && (
-                <span className="absolute top-1 left-1 bg-navy-400 text-white text-[10px] px-1.5 py-0.5 rounded font-medium">
+                <span className="absolute top-1 left-1 bg-brand-400 text-white text-[10px] px-1.5 py-0.5 rounded font-medium">
                   Capa
                 </span>
               )}
               <button
                 type="button"
                 onClick={() => removeItem(i)}
+                aria-label={`Remover mídia ${i + 1}`}
                 className="absolute top-1 right-1 w-6 h-6 bg-black/60 text-white rounded-full flex items-center justify-center text-sm hover:bg-black/80"
               >
                 &times;
@@ -175,7 +194,7 @@ export default function MediaUploader({ items, onChange }: MediaUploaderProps) {
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="aspect-square rounded-xl border-2 border-dashed border-white/20 flex flex-col items-center justify-center text-warm-400 hover:border-navy-400 hover:text-navy-600 transition-colors"
+              className="aspect-square rounded-xl border-2 border-dashed border-white/20 flex flex-col items-center justify-center text-warm-400 hover:border-brand-400 hover:text-brand-600 transition-colors"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -205,7 +224,7 @@ export default function MediaUploader({ items, onChange }: MediaUploaderProps) {
               <button
                 type="button"
                 onClick={() => cameraInputRef.current?.click()}
-                className="flex items-center gap-1.5 px-3 py-2 bg-navy-400 text-white rounded-lg text-sm font-medium hover:bg-navy-300 active:scale-95 transition-all"
+                className="flex items-center gap-1.5 px-3 py-2 bg-brand-400 text-white rounded-lg text-sm font-medium hover:bg-brand-300 active:scale-95 transition-all"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
@@ -243,7 +262,7 @@ export default function MediaUploader({ items, onChange }: MediaUploaderProps) {
       {/* Loading */}
       {uploading && items.length === 0 && (
         <div className="border-2 border-dashed border-white/20 rounded-2xl py-10 flex items-center justify-center">
-          <div className="w-8 h-8 border-4 border-navy-600 border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-4 border-brand-600 border-t-transparent rounded-full animate-spin" />
         </div>
       )}
 
@@ -254,7 +273,7 @@ export default function MediaUploader({ items, onChange }: MediaUploaderProps) {
             <button
               type="button"
               onClick={() => cameraInputRef.current?.click()}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-navy-300 bg-navy-400/10 rounded-lg hover:bg-navy-400/20 active:scale-95 transition-all"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-brand-300 bg-brand-400/10 rounded-lg hover:bg-brand-400/20 active:scale-95 transition-all"
             >
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
@@ -280,8 +299,8 @@ export default function MediaUploader({ items, onChange }: MediaUploaderProps) {
 
       {/* Uploading indicator */}
       {uploading && items.length > 0 && (
-        <div className="flex items-center gap-2 text-sm text-navy-600 mt-2">
-          <div className="w-4 h-4 border-2 border-navy-600 border-t-transparent rounded-full animate-spin" />
+        <div className="flex items-center gap-2 text-sm text-brand-600 mt-2">
+          <div className="w-4 h-4 border-2 border-brand-600 border-t-transparent rounded-full animate-spin" />
           Enviando...
         </div>
       )}

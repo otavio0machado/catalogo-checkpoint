@@ -26,7 +26,7 @@ export default function SearchBar() {
       if (genre) params.set('genre', genre);
       if (condition) params.set('condition', condition);
       const query = params.toString();
-      router.push(query ? `/loja?${query}` : '/loja');
+      router.replace(query ? `/loja?${query}` : '/loja');
     }, 250);
 
     return () => clearTimeout(timeout);
@@ -43,7 +43,7 @@ export default function SearchBar() {
           placeholder="Buscar jogo, plataforma, marca ou SKU..."
           value={search}
           onChange={(event) => setSearch(event.target.value)}
-          className="w-full rounded-xl border border-white/10 bg-white/[0.06] py-3 pl-10 pr-4 text-sm text-white outline-none transition placeholder:text-warm-500 focus:border-navy-400 focus:ring-2 focus:ring-navy-400/20"
+          className="w-full rounded-xl border border-white/10 bg-white/[0.06] py-3 pl-10 pr-4 text-sm text-white outline-none transition placeholder:text-warm-500 focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20"
         />
       </div>
 
@@ -76,7 +76,7 @@ function FilterSelect({
       <select
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="w-full min-w-0 rounded-xl border border-white/10 bg-[#181818] px-3 py-2.5 text-xs text-warm-100 outline-none transition focus:border-navy-400 focus:ring-2 focus:ring-navy-400/20"
+        className="w-full min-w-0 rounded-xl border border-white/10 bg-[#181818] px-3 py-2.5 text-xs text-warm-100 outline-none transition focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20"
       >
         {options.map((option) => (
           <option key={option} value={option === emptyLabel ? '' : option}>

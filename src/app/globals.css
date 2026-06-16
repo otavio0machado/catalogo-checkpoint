@@ -6,7 +6,8 @@
   --color-warm-200: #deded7;
   --color-warm-300: #c1c0b7;
   --color-warm-400: #929188;
-  --color-warm-500: #727067;
+  /* warm-500 clareado para atingir contraste AA (~5:1) sobre o fundo #111. */
+  --color-warm-500: #8a887e;
   --color-warm-600: #55534c;
   --color-warm-700: #3c3a35;
   --color-warm-800: #262521;
@@ -23,16 +24,16 @@
   --color-olive-800: #953912;
   --color-olive-900: #782f12;
 
-  --color-navy-50:  #fff5df;
-  --color-navy-100: #ffe5a6;
-  --color-navy-200: #ffd36c;
-  --color-navy-300: #ffbd38;
-  --color-navy-400: #ffa51f;
-  --color-navy-500: #ff8a12;
-  --color-navy-600: #ef6f0a;
-  --color-navy-700: #df5607;
-  --color-navy-800: #b9440b;
-  --color-navy-900: #7a260d;
+  --color-brand-50:  #fff5df;
+  --color-brand-100: #ffe5a6;
+  --color-brand-200: #ffd36c;
+  --color-brand-300: #ffbd38;
+  --color-brand-400: #ffa51f;
+  --color-brand-500: #ff8a12;
+  --color-brand-600: #ef6f0a;
+  --color-brand-700: #df5607;
+  --color-brand-800: #b9440b;
+  --color-brand-900: #7a260d;
 
   --color-whatsapp: #25D366;
   --color-whatsapp-dark: #1fba59;
@@ -51,7 +52,7 @@ body {
 }
 
 ::selection {
-  background: var(--color-navy-300);
+  background: var(--color-brand-300);
   color: #111111;
 }
 
@@ -69,7 +70,7 @@ body {
 
 .AdminIconButton:hover {
   background: rgba(255, 183, 44, 0.12);
-  color: var(--color-navy-300);
+  color: var(--color-brand-300);
 }
 
 .LandingShell {

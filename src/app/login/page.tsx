@@ -42,7 +42,7 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
           <Link href="/" className="text-xl font-black uppercase">
-            Check<span className="text-navy-300">point</span> Games
+            Check<span className="text-brand-300">point</span> Games
           </Link>
           <p className="mt-2 text-sm text-warm-500">Acesso administrativo</p>
         </div>
@@ -55,7 +55,7 @@ export default function LoginPage() {
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               required
-              className="w-full rounded-xl border border-white/10 bg-[#151515] px-4 py-3 text-white outline-none focus:border-navy-400 focus:ring-2 focus:ring-navy-400/20"
+              className="w-full rounded-xl border border-white/10 bg-[#151515] px-4 py-3 text-white outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20"
               placeholder="admin@checkpointgames.com.br"
             />
           </label>
@@ -67,14 +67,14 @@ export default function LoginPage() {
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               required
-              className="w-full rounded-xl border border-white/10 bg-[#151515] px-4 py-3 text-white outline-none focus:border-navy-400 focus:ring-2 focus:ring-navy-400/20"
+              className="w-full rounded-xl border border-white/10 bg-[#151515] px-4 py-3 text-white outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20"
               placeholder="••••••••"
             />
           </label>
 
           {error && <p className="text-center text-sm text-red-300">{error}</p>}
 
-          <button disabled={loading} className="w-full rounded-xl bg-navy-400 px-5 py-3.5 text-base font-black text-[#111] transition hover:bg-navy-300 disabled:opacity-50">
+          <button disabled={loading} className="w-full rounded-xl bg-brand-400 px-5 py-3.5 text-base font-black text-[#111] transition hover:bg-brand-300 disabled:opacity-50">
             {loading ? 'Entrando...' : 'Entrar'}
           </button>
         </form>
