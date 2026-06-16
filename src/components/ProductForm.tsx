@@ -1,14 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import type { MediaItem, Product, ProductAIAnalysis, ProductStatus, StoreStock } from '@/types';
+import type { MediaItem, Product, ProductAIAnalysis, StoreStock } from '@/types';
 import { STORES, extractMediaItems, parseStoreStock, totalStoreStock } from '@/lib/products';
 import MediaUploader from './MediaUploader';
 import ConditionSelector from './ConditionSelector';
 
 const TYPES: Product['type'][] = ['Jogo', 'Console', 'Acessório', 'Colecionável', 'Gift Card', 'Outro'];
 const FORMATS = ['Disco', 'Cartucho', 'Digital', 'Código', 'Console', 'Acessório', 'Colecionável'];
-const STATUSES: ProductStatus[] = ['available', 'reserved', 'sold', 'hidden'];
 
 interface ProductFormProps {
   initialData?: Partial<Product>;
@@ -28,9 +27,6 @@ export default function ProductForm({ initialData, onSubmit, submitLabel = 'Salv
   const [priceDisplay, setPriceDisplay] = useState(
     initialData?.price_cents ? (initialData.price_cents / 100).toFixed(2) : ''
   );
-  const [compareDisplay, setCompareDisplay] = useState(
-    initialData?.compare_at_price_cents ? (initialData.compare_at_price_cents / 100).toFixed(2) : ''
-  );
   const [form, setForm] = useState<Partial<Product>>({
     type: 'Jogo',
     title: '',
@@ -43,16 +39,12 @@ export default function ProductForm({ initialData, onSubmit, submitLabel = 'Salv
     condition: 'Usado',
     condition_detail: '',
     condition_notes: '',
-    includes: '',
     description: '',
     price_cents: 0,
     compare_at_price_cents: null,
     stock: 1,
     sku: '',
     age_rating: '',
-    players: '',
-    online_support: '',
-    warranty_notes: '',
     weight_kg: 0.2,
     width_cm: 14,
     length_cm: 17,
@@ -83,11 +75,10 @@ export default function ProductForm({ initialData, onSubmit, submitLabel = 'Salv
     }
   }
 
-  function handleMoneyChange(value: string, field: 'price_cents' | 'compare_at_price_cents') {
+  function handlePriceChange(value: string) {
     const cents = Math.round(Number(value.replace(',', '.') || '0') * 100);
-    if (field === 'price_cents') setPriceDisplay(value);
-    if (field === 'compare_at_price_cents') setCompareDisplay(value);
-    updateField(field, cents > 0 ? cents : field === 'price_cents' ? 0 : null);
+    setPriceDisplay(value);
+    updateField('price_cents', cents > 0 ? cents : 0);
   }
 
   async function imageToBase64(url: string): Promise<{ imageBase64: string; mimeType: string }> {
@@ -135,7 +126,6 @@ export default function ProductForm({ initialData, onSubmit, submitLabel = 'Salv
   function applyAnalysis() {
     if (!analysis) return;
     const priceCents = analysis.suggested_price_cents || 0;
-    const compareCents = analysis.compare_at_price_cents || null;
 
     setForm((prev) => ({
       ...prev,
@@ -150,22 +140,16 @@ export default function ProductForm({ initialData, onSubmit, submitLabel = 'Salv
       condition: analysis.condition_detail.startsWith('Novo') ? 'Novo' : 'Usado',
       condition_detail: analysis.condition_detail || prev.condition_detail,
       condition_notes: analysis.condition_notes || prev.condition_notes,
-      includes: analysis.includes || prev.includes,
       description: analysis.description || prev.description,
       price_cents: priceCents,
-      compare_at_price_cents: compareCents,
       sku: analysis.sku || prev.sku,
       age_rating: analysis.age_rating || prev.age_rating,
-      players: analysis.players || prev.players,
-      online_support: analysis.online_support || prev.online_support,
-      warranty_notes: analysis.warranty_notes || prev.warranty_notes,
       weight_kg: analysis.weight_kg || prev.weight_kg,
       width_cm: analysis.width_cm || prev.width_cm,
       length_cm: analysis.length_cm || prev.length_cm,
       height_cm: analysis.height_cm || prev.height_cm,
     }));
     setPriceDisplay(priceCents ? (priceCents / 100).toFixed(2) : '');
-    setCompareDisplay(compareCents ? (compareCents / 100).toFixed(2) : '');
     setAnalysisApplied(true);
   }
 
@@ -248,10 +232,8 @@ export default function ProductForm({ initialData, onSubmit, submitLabel = 'Salv
       </FormSection>
 
       <FormSection title="Venda">
-        <div className="grid gap-4 sm:grid-cols-3">
-          <Input label="Preço (R$)" value={priceDisplay} onChange={(value) => handleMoneyChange(value, 'price_cents')} placeholder="149.90" />
-          <Input label="Preço de comparação (R$)" value={compareDisplay} onChange={(value) => handleMoneyChange(value, 'compare_at_price_cents')} placeholder="179.90" />
-          <Select label="Status" value={form.status || 'available'} onChange={(value) => updateField('status', value)} options={STATUSES} />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Input label="Preço (R$)" value={priceDisplay} onChange={handlePriceChange} placeholder="149.90" />
         </div>
       </FormSection>
 
@@ -271,16 +253,6 @@ export default function ProductForm({ initialData, onSubmit, submitLabel = 'Salv
         <p className="text-sm text-warm-400">
           Estoque total: <span className="font-black text-white">{form.stock ?? 0}</span>
         </p>
-      </FormSection>
-
-      <FormSection title="Detalhes">
-        <Textarea label="Descrição" value={form.description || ''} onChange={(value) => updateField('description', value)} rows={4} />
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Input label="Incluso" value={form.includes || ''} onChange={(value) => updateField('includes', value)} placeholder="Caixa, manual, cabo..." />
-          <Input label="Jogadores" value={form.players || ''} onChange={(value) => updateField('players', value)} />
-          <Input label="Online" value={form.online_support || ''} onChange={(value) => updateField('online_support', value)} />
-          <Input label="Garantia" value={form.warranty_notes || ''} onChange={(value) => updateField('warranty_notes', value)} />
-        </div>
       </FormSection>
 
       <FormSection title="Envio">
