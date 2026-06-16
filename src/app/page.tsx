@@ -34,14 +34,6 @@ export default function LandingPage() {
                 <span>Carrinho</span>
               </Link>
             </div>
-            <div className="LandingReveal mt-5 grid max-w-lg gap-2 text-xs font-bold text-warm-300 sm:grid-cols-3 [animation-delay:270ms]">
-              {['Atualização contínua', 'Reserva rápida', 'Retirada combinada'].map((item) => (
-                <div key={item} className="LivePill flex min-h-12 items-center gap-2 rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2 leading-tight">
-                  <span className="h-2 w-2 rounded-full bg-brand-400" />
-                  <span>{item}</span>
-                </div>
-              ))}
-            </div>
           </div>
 
           <ConsoleCarousel />
