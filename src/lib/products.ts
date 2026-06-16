@@ -1,6 +1,9 @@
-import type { Product, ProductStatus } from '@/types';
+import type { Product, ProductStatus, StoreStock } from '@/types';
 
 export const PRODUCT_STATUSES: ProductStatus[] = ['available', 'reserved', 'sold', 'hidden'];
+
+/** Lojas físicas onde os produtos podem estar em estoque. */
+export const STORES = ['Shopping Total', 'Shopping Wallig', 'Shopping Bourbon'] as const;
 
 const PUBLIC_PRODUCT_FIELDS: (keyof Product)[] = [
   'id',
@@ -20,6 +23,7 @@ const PUBLIC_PRODUCT_FIELDS: (keyof Product)[] = [
   'price_cents',
   'compare_at_price_cents',
   'stock',
+  'store_stock',
   'sku',
   'age_rating',
   'players',
@@ -50,6 +54,33 @@ export function parseMedia<T extends Record<string, unknown>>(row: T): T {
   return mutable;
 }
 
+/**
+ * Normaliza o estoque por loja em um objeto com todas as lojas conhecidas,
+ * garantindo quantidades inteiras não-negativas. Aceita objeto ou string JSON.
+ */
+export function parseStoreStock(value: unknown): StoreStock {
+  let raw: unknown = value;
+  if (typeof raw === 'string') {
+    try {
+      raw = JSON.parse(raw);
+    } catch {
+      raw = {};
+    }
+  }
+  const source = raw && typeof raw === 'object' ? (raw as Record<string, unknown>) : {};
+  const result: StoreStock = {};
+  for (const store of STORES) {
+    const qty = Math.floor(Number(source[store]));
+    result[store] = Number.isFinite(qty) && qty > 0 ? qty : 0;
+  }
+  return result;
+}
+
+/** Soma das quantidades por loja. */
+export function totalStoreStock(storeStock: StoreStock): number {
+  return STORES.reduce((sum, store) => sum + (storeStock[store] || 0), 0);
+}
+
 export function sanitizePublicProduct(row: Record<string, unknown>): Partial<Product> {
   const parsed = parseMedia(row);
   return Object.fromEntries(
@@ -74,6 +105,13 @@ export function normalizeProductPayload(body: Record<string, unknown>) {
     const explicitPhotoUrl = typeof body.photo_url === 'string' ? body.photo_url : '';
     payload.media = JSON.stringify(mediaItems);
     payload.photo_url = explicitPhotoUrl || firstMediaUrl;
+  }
+
+  if ('store_stock' in body) {
+    const storeStock = parseStoreStock(body.store_stock);
+    payload.store_stock = storeStock;
+    // O estoque total é derivado da soma das quantidades por loja.
+    payload.stock = totalStoreStock(storeStock);
   }
 
   if ('condition_detail' in body && typeof body.condition_detail === 'string') {

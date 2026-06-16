@@ -4,7 +4,7 @@ import AddToCartButton from './AddToCartButton';
 import MediaGallery from '@/components/MediaGallery';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { formatCurrency, formatPriceLabel, hasKnownPrice } from '@/lib/price';
-import { parseMedia } from '@/lib/products';
+import { parseMedia, parseStoreStock, STORES } from '@/lib/products';
 
 function mediaItems(product: Product): MediaItem[] {
   if (Array.isArray(product.media) && product.media.length > 0) return product.media;
@@ -56,6 +56,9 @@ export default async function ProdutoPage({ params }: { params: Promise<{ id: st
     !!product.compare_at_price_cents &&
     product.compare_at_price_cents > product.price_cents;
 
+  const storeStock = parseStoreStock(product.store_stock);
+  const availableStores = STORES.filter((store) => storeStock[store] > 0);
+
   return (
     <div className="min-h-screen bg-[#111] text-white">
       <header className="sticky top-0 z-40 border-b border-white/10 bg-[#111]/90 backdrop-blur">
@@ -103,6 +106,19 @@ export default async function ProdutoPage({ params }: { params: Promise<{ id: st
           )}
 
           <p className="text-sm leading-relaxed text-warm-300">{product.description}</p>
+
+          {availableStores.length > 0 && (
+            <div className="rounded-xl border border-white/10 bg-white/[0.04] p-4">
+              <p className="text-xs font-black uppercase tracking-wide text-navy-300">Disponível nas lojas</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {availableStores.map((store) => (
+                  <span key={store} className="rounded-lg bg-white/[0.07] px-3 py-1 text-xs font-bold text-warm-200">
+                    {store} · {storeStock[store]}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="grid grid-cols-2 gap-3 border-t border-white/10 pt-5 text-sm">
             {[

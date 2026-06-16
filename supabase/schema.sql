@@ -16,6 +16,7 @@ create table if not exists public.products (
   price_cents integer not null default 0,
   compare_at_price_cents integer,
   stock integer not null default 1,
+  store_stock jsonb not null default '{}'::jsonb,
   sku text not null default '',
   age_rating text not null default '',
   players text not null default '',

@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import type { MediaItem, Product, ProductAIAnalysis, ProductStatus } from '@/types';
+import type { MediaItem, Product, ProductAIAnalysis, ProductStatus, StoreStock } from '@/types';
+import { STORES, parseStoreStock, totalStoreStock } from '@/lib/products';
 import MediaUploader from './MediaUploader';
 import ConditionSelector from './ConditionSelector';
 
@@ -71,10 +72,19 @@ export default function ProductForm({ initialData, onSubmit, submitLabel = 'Salv
     height_cm: 2,
     status: 'available',
     ...initialData,
+    store_stock: parseStoreStock(initialData?.store_stock),
   });
 
   function updateField(field: keyof Product, value: string | number | boolean | null) {
     setForm((prev) => ({ ...prev, [field]: value }));
+  }
+
+  function updateStoreStock(store: string, value: number) {
+    setForm((prev) => {
+      const next: StoreStock = { ...(prev.store_stock || {}), [store]: Math.max(0, Math.floor(value) || 0) };
+      // Mantém o estoque total sincronizado com a soma das lojas.
+      return { ...prev, store_stock: next, stock: totalStoreStock(next) };
+    });
   }
 
   function handleMediaChange(items: MediaItem[]) {
@@ -251,9 +261,26 @@ export default function ProductForm({ initialData, onSubmit, submitLabel = 'Salv
         <div className="grid gap-4 sm:grid-cols-3">
           <Input label="Preço (R$)" value={priceDisplay} onChange={(value) => handleMoneyChange(value, 'price_cents')} placeholder="149.90" />
           <Input label="Preço de comparação (R$)" value={compareDisplay} onChange={(value) => handleMoneyChange(value, 'compare_at_price_cents')} placeholder="179.90" />
-          <Input label="Estoque" type="number" value={String(form.stock ?? 1)} onChange={(value) => updateField('stock', Number(value) || 0)} />
           <Select label="Status" value={form.status || 'available'} onChange={(value) => updateField('status', value)} options={STATUSES} />
         </div>
+      </FormSection>
+
+      <FormSection title="Estoque por loja">
+        <div className="grid gap-4 sm:grid-cols-3">
+          {STORES.map((store) => (
+            <Input
+              key={store}
+              label={store}
+              type="number"
+              step="1"
+              value={String(form.store_stock?.[store] ?? 0)}
+              onChange={(value) => updateStoreStock(store, Number(value))}
+            />
+          ))}
+        </div>
+        <p className="text-sm text-warm-400">
+          Estoque total: <span className="font-black text-white">{form.stock ?? 0}</span>
+        </p>
       </FormSection>
 
       <FormSection title="Detalhes">

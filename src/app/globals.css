@@ -71,3 +71,205 @@ body {
   background: rgba(255, 183, 44, 0.12);
   color: var(--color-navy-300);
 }
+
+.LandingShell {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.028) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.024) 1px, transparent 1px);
+  background-position: center top;
+  background-size: 48px 48px;
+}
+
+.LandingReveal {
+  animation: landing-reveal 620ms ease both;
+}
+
+.MotionButton {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.MotionButton > * {
+  position: relative;
+  z-index: 1;
+}
+
+.MotionButton::before {
+  content: "";
+  position: absolute;
+  inset: -30% auto -30% -45%;
+  width: 42%;
+  transform: skewX(-18deg);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.34), transparent);
+  opacity: 0;
+  z-index: 0;
+}
+
+.MotionButton:hover::before {
+  animation: button-sheen 720ms ease;
+  opacity: 1;
+}
+
+.MotionButton:hover svg {
+  transform: translateX(2px);
+}
+
+.LivePill {
+  transition: border-color 180ms ease, background-color 180ms ease, transform 180ms ease;
+}
+
+.LivePill:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 189, 56, 0.34);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.LivePill span:first-child {
+  animation: status-pulse 1400ms ease-in-out infinite;
+}
+
+.ConsoleFrame {
+  position: relative;
+  isolation: isolate;
+  animation: console-float 5200ms ease-in-out infinite;
+}
+
+.ConsoleFrame::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.08) 46%, transparent 58%);
+  transform: translateX(-125%);
+  animation: frame-sweep 4200ms ease-in-out infinite;
+}
+
+.ConsoleImage {
+  animation: console-reveal 420ms ease both;
+}
+
+.CarouselProgress {
+  width: 100%;
+  transform-origin: left center;
+  animation: carousel-progress 2000ms linear both;
+}
+
+.StepCard {
+  margin: -0.5rem;
+}
+
+.StepCard:hover {
+  background: rgba(255, 255, 255, 0.04);
+  transform: translateY(-3px);
+}
+
+.StepCard:hover .StepNumber {
+  animation: step-pop 520ms ease;
+}
+
+@keyframes landing-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes button-sheen {
+  from {
+    transform: translateX(0) skewX(-18deg);
+  }
+  to {
+    transform: translateX(360%) skewX(-18deg);
+  }
+}
+
+@keyframes status-pulse {
+  0%,
+  100% {
+    opacity: 0.58;
+    box-shadow: 0 0 0 0 rgba(255, 165, 31, 0.24);
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 0 5px rgba(255, 165, 31, 0);
+  }
+}
+
+@keyframes console-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes frame-sweep {
+  0%,
+  44% {
+    transform: translateX(-125%);
+  }
+  64%,
+  100% {
+    transform: translateX(125%);
+  }
+}
+
+@keyframes console-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes carousel-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes step-pop {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.12);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .LandingReveal,
+  .LivePill span:first-child,
+  .ConsoleFrame,
+  .ConsoleFrame::before,
+  .ConsoleImage,
+  .CarouselProgress,
+  .StepCard:hover .StepNumber,
+  .MotionButton:hover::before {
+    animation: none;
+  }
+
+  .LivePill:hover,
+  .StepCard:hover {
+    transform: none;
+  }
+}

@@ -11,8 +11,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Checkpoint Games — catalogo gamer",
-  description: "Jogos, consoles e acessorios selecionados para reservar pelo WhatsApp na Checkpoint Games.",
+  title: "Checkpoint Games — catálogo gamer",
+  description: "Jogos, consoles e acessórios selecionados para reservar pelo WhatsApp na Checkpoint Games.",
 };
 
 export const viewport: Viewport = {

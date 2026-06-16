@@ -26,3 +26,7 @@ npm-debug.log*
 # data
 /data/
 .vercel
+
+# arquivos locais / privados (não versionar)
+*.dmg
+Contrato-Checkpoint-Games.docx

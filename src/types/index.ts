@@ -6,6 +6,9 @@ export interface MediaItem {
 
 export type ProductStatus = 'available' | 'reserved' | 'sold' | 'hidden';
 
+/** Quantidade em estoque por loja: { "Shopping Total": 2, ... } */
+export type StoreStock = Record<string, number>;
+
 export interface Product {
   id: number;
   type: 'Jogo' | 'Console' | 'Acessório' | 'Colecionável' | 'Gift Card' | 'Outro';
@@ -24,6 +27,7 @@ export interface Product {
   price_cents: number;
   compare_at_price_cents: number | null;
   stock: number;
+  store_stock: StoreStock;
   sku: string;
   age_rating: string;
   players: string;

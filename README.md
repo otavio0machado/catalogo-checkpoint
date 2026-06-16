@@ -1,4 +1,4 @@
-# Checkpoint Games Catalogo
+# Checkpoint Games Catálogo
 
 Sistema de catálogo para jogos, consoles, acessórios, gift cards e colecionáveis. O fluxo é simples: o cliente navega no catálogo, adiciona produtos ao carrinho e finaliza pelo WhatsApp.
 

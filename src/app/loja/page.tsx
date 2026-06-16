@@ -64,7 +64,7 @@ export default async function LojaPage({
       <main className="mx-auto max-w-6xl px-5 py-6">
         <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h1 className="text-2xl font-black uppercase tracking-normal text-white">Catalogo</h1>
+            <h1 className="text-2xl font-black uppercase tracking-normal text-white">Catálogo</h1>
             <p className="mt-1 text-sm text-warm-400">
               {products.length} {products.length === 1 ? 'produto disponível' : 'produtos disponíveis'}
             </p>
